@@ -5,7 +5,7 @@ import java.util.TreeMap;
 
 /**
  * Matches sub images brightness levels to the closest ASCII character brightness
- * @author Diana Basil TODO
+ * @author Diana Basil and Meital Lubarski
  */
 public class SubImgCharMatcher {
     private final BrightnessAscii asciiBrightness;
@@ -13,6 +13,7 @@ public class SubImgCharMatcher {
     // tree map for fast searching, key=NormBrightness, value is the character
     private final TreeMap<Double, Character> NormBToCharTreeMap;
     private boolean changedCharacters;
+    private boolean reverseState = false; // reverse feature
 
     /**
      * Constructs a character matcher initialized with a specific starting set of characters.
@@ -42,6 +43,11 @@ public class SubImgCharMatcher {
         }
     }
 
+    /** change state of reverse flag */
+    public void changeReverse() {
+        this.reverseState = !this.reverseState;
+    }
+
     /**
      * given brightness of an image we return the char of the norm brightness which is closest.
      * @param brightness The  brightness of an image
@@ -50,6 +56,25 @@ public class SubImgCharMatcher {
     public char getCharByImageBrightness(double brightness){
         if (changedCharacters) {
             updateTreeMap();
+        }
+        if (reverseState) { // if we are in reverse state
+            double oppB = 1.0 - brightness;
+            // what if our set is empty?
+            if (NormBToCharTreeMap.isEmpty()) { // TODO maybe delte, depends on shell logic
+                // TODO rather delete, breaks capsultion a little bit!!
+                throw new IllegalStateException("character set is empty.");
+            }
+            double minB = NormBToCharTreeMap.firstKey();
+            double maxB = NormBToCharTreeMap.lastKey();
+            if (oppB < minB) {
+                brightness = minB; // TODO CHECK WITH FORUM
+            }
+            else if (oppB > maxB) {
+                brightness = maxB; // TODO CHECK WITH FORUM
+            }
+            else {
+                brightness = oppB;
+            }
         }
         // the most close key (NormBrightness) to image brightness value
         Double closeUp = NormBToCharTreeMap.ceilingKey(brightness);
