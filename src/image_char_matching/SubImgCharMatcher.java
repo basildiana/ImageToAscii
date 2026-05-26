@@ -2,6 +2,7 @@ package image_char_matching;
 
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Matches sub images brightness levels to the closest ASCII character brightness
@@ -154,5 +155,9 @@ public class SubImgCharMatcher {
             NormBToCharTreeMap.put(normBrightness, c);
         }
         changedCharacters = false; // the tree is most updated, so flag is false
+    }
+
+    public TreeSet<Character> getCharset(){
+        return new TreeSet<>(characters);
     }
 }
