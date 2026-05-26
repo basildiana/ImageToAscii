@@ -19,6 +19,8 @@ public class add implements feature {
     public add(SubImgCharMatcher subImgCharMatcher) {
         this.charMatcher = subImgCharMatcher;
     }
+    /** executes the feature logic
+     * @param args user args after the type of feature*/
     @Override
     public void execute(String args) throws AsciiExceptions {
 
