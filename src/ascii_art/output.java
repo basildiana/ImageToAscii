@@ -13,9 +13,8 @@ public class output implements feature{
     private static final String CONSOLE = "console";
     private static final String HTML = "html";
     private static final String SPACE_REGEX = "\\s+";
-
-    private static final String HTML_FILE_NAME = "html.out";
-    private static final String HTML_FONT = "New Courier";
+    private static final String HTML_FILE_NAME = "out.html";
+    private static final String HTML_FONT = "Courier New";
 
     private AsciiOutput currentOutput;
 
