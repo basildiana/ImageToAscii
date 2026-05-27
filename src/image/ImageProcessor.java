@@ -1,7 +1,6 @@
 package image;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.awt.Color;
 
 /**
@@ -18,8 +17,9 @@ public class ImageProcessor {
     private static final double GREEN_GREYSCALE = 0.7152;
     private static final double BLUE_GREYSCALE = 0.0722;
 
-    private final Map<Integer, Image[][]> subImageCache = new HashMap<>();
-    private final Map<Image, Double> brightnessCache = new HashMap<>();
+    private int lastResolution = -1;
+    private Image[][] lastSubImages = null;
+    private double[][] lastBrightness = null;
     /**
      * Pads the given image with white pixels so its width and height are powers of two.
      *
@@ -47,8 +47,8 @@ public class ImageProcessor {
      * @return A two-dimensional array of sub-images.
      */
     public Image[][] splitToSubImages(Image image, int resolution) {
-        if(subImageCache.containsKey(resolution)) {
-            return subImageCache.get(resolution);
+        if(resolution == lastResolution && lastSubImages != null) {
+            return lastSubImages;
         }
         int subImageSize = image.getWidth() / resolution;
         int rows = image.getHeight() / subImageSize;
@@ -58,7 +58,12 @@ public class ImageProcessor {
                 subImages[row][col] = createSubImage(image, row, col, subImageSize);
             }
         }
-        subImageCache.put(resolution, subImages);
+        lastResolution = resolution;
+        lastSubImages = subImages;
+        lastBrightness = new double[rows][resolution];
+        for(int row = 0; row < rows; row++){
+            Arrays.fill(lastBrightness[row], -1);
+        }
         return subImages;
     }
 
@@ -69,8 +74,9 @@ public class ImageProcessor {
      * @return Brightness value between 0 and 1.
      */
     public double calculateBrightness(Image image) {
-        if(brightnessCache.containsKey(image)){
-            return brightnessCache.get(image);
+        int[] location = findSubImage(image);
+        if(location != null && lastBrightness[location[0]][location[1]] != -1){
+            return lastBrightness[location[0]][location[1]];
         }
         double greySum = 0;
         int width = image.getWidth();
@@ -81,8 +87,24 @@ public class ImageProcessor {
             }
         }
         double brightness = greySum / (width * height * RGB_MAX_VALUE);
-        brightnessCache.put(image, brightness);
+        if(location != null) {
+            lastBrightness[location[0]][location[1]] = brightness;
+        }
         return brightness;
+    }
+
+    private int[] findSubImage(Image image){
+        if(lastSubImages == null){
+            return null;
+        }
+        for(int row = 0; row < lastSubImages.length; row++){
+            for(int col = 0; col < lastSubImages[row].length; col++){
+                if(lastSubImages[row][col] == image){
+                    return new int[]{row, col};
+                }
+            }
+        }
+        return null;
     }
 
     private Color[][] createPaddedPixels(Image image, int newWidth, int newHeight) {
