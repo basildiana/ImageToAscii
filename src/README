@@ -1,0 +1,95 @@
+diana_.1b, meital
+209780824, 206480964
+
+1) Class+Responsibilities
+Shell: Acts as the central user interface manager. It runs a loop that captures keyboard input using,
+parses text into tokens, and safely routes execution paths to decouple command from algorithmic logic.
+
+AsciiArtAlgorithm: does a single operational run mapping images into character arrays. takes specific
+instances of image data and matching components to generate grid, serving as a high level controller.
+
+feature: A strategy pattern interface defining a contract via execute(String args).
+This design choice leverages polymorphism, enabling the shell to dynamically execute
+user commands without knowing their specific underlying logic.
+
+add: Implements the feature interface to parse and handle token arguments for adding characters.
+This isolates the parsing grammar of character entry into its own dedicated class.
+
+remove: Implements the feature interface to safely extract characters from the active set.
+encapsulating the removal grammar to ensure the shell stays lean and clean.
+
+reverse: Implements the feature interface to change the reverseState. Interacts with character matcher
+to invert how symbols match image pixels, encapsulating the trigger logic away from the shell loop.
+
+Output:// TODO MEITAL
+
+Res: // TODO MEITAL
+
+Chars: // TODO MEITAL
+
+ImageProcessor: // TODO MEITAL
+
+AsciiExceptions: A checked exception class handling validation, syntax, and execution errors.
+separates error string assembly from active program logic, using the Single Responsibility Principle.
+
+SubImgCharMatcher: Matches subimage brightness levels to the closest ASCII symbol. coordinates the active
+character, performs linear stretch stretching, and isolates its matching data from the outer shell.
+
+BrightnessAscii: Computes and stores the unnormalized raw brightness values for characters.
+maintaining Single Responsibility Principle by keeping character calculations out of other components.
+
+CharConverter: Renders standard font characters directly into binary boolean matrix blocks. // we didnt changed
+Image: Bundles  pixel layouts into clean matrix grids // we didnt changed
+
+
+2) Data Structures for Efficiency
+in BrightnessAscii: double[] AsciiNumArray
+It optimizes memory usage by maintaining aמ array of exactly 95 slots (the legal ASCII characters)
+and provides constant time O(1) lookup for any character's raw brightness.
+we chose this because raw brightness doesn't change.
+
+in SubImgCharMatcher:
+HashSet<Character> characters: keeps track of unique active chars dynamically.
+This choice guarantees fast O(1) average time complexity for additions, removals,
+and verification checks when modifying the active pool.
+
+TreeMap<Double, Character> NormBToCharTreeMap: Maps normalized brightness scales to characters.
+This allows us to find floor and ceiling keys in efficient logarithmic O(log N) time,
+optimizing matching speeds during the pixel to character loop
+
+in Shell:
+Map<String, feature> featureMap: Maps command strings to their feature instances.
+This replaces nested conditional blocks with clean O(1) constant time lookups.
+
+in Chars:
+// TODO MEITAL please explain idk this
+
+in ImageProcessor:
+double[][] lastBrightnessArr:Stores the evaluated subimage matrix. saving calculations across consecutive
+execution runs avoids redundant processing cycles, heavily optimizing the program's overall runtime efficiency.
+
+
+3) Exception Handling Strategy:
+*Single Responsibility Principle: We encapsulated all parsing,syntax, and boundary violations inside a class
+called AsciiExceptions. This keeps our user interface classes free from string building or logging code.
+*Static Factory Pattern: Instead of creating separate small files, we used descriptive static factory methods
+within a single exception class. This lets us cleanly reuse common error messages and constants.
+*Information Hiding: Reusable error strings are stored as private static constants.
+*Checked Exceptions for Type Safety: Inheriting directly from the standard Java Exception class forces
+explicit safety tracking through compile time throws declarations. This ensures compile time safety.
+
+4) SubImgCharMatcher API Alterations:
+public void changeReverse(): Added to let the shell change the reverse mapping state.
+This enforces clear encapsulation and information hiding, as the shell doesn't need to know how
+the mathematical inversion is calculated.
+
+public TreeSet<Character> getCharset(): Added to safely expose a sorted snapshot of the active symbol collection.
+Returning a new instance preserves defensive copying principles, preventing outer classes
+from corrupting internal collections.
+// TODO MEITAL check if you added more? or if there is more additions to the public api
+
+These changes keep character mapping calculations completely encapsulated inside the matcher component,
+ensuring that how an image's brightness corresponds to a character is managed in one single place.
+
+5) More API changes in classes?
+// TODO MEITAL check if you added alterations? im not sure with the image proccesor and that array
