@@ -22,11 +22,11 @@ public class AsciiArtAlgorithm {
      * @param resolution  The resolution
      * @param subImgCharMatcher the active character set
      */
-    public AsciiArtAlgorithm(Image image, int resolution, SubImgCharMatcher subImgCharMatcher) {
+    public AsciiArtAlgorithm(Image image, int resolution, SubImgCharMatcher subImgCharMatcher, ImageProcessor imageProcessor) {
         this.image = image;
         this.resolution = resolution;
         this.charManager = subImgCharMatcher;
-        this.imageProcessor = new ImageProcessor();
+        this.imageProcessor = imageProcessor;
     }
 
     /**

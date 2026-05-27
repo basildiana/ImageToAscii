@@ -1,5 +1,7 @@
 package image;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.awt.Color;
 
 /**
@@ -16,6 +18,8 @@ public class ImageProcessor {
     private static final double GREEN_GREYSCALE = 0.7152;
     private static final double BLUE_GREYSCALE = 0.0722;
 
+    private final Map<Integer, Image[][]> subImageCache = new HashMap<>();
+    private final Map<Image, Double> brightnessCache = new HashMap<>();
     /**
      * Pads the given image with white pixels so its width and height are powers of two.
      *
@@ -43,6 +47,9 @@ public class ImageProcessor {
      * @return A two-dimensional array of sub-images.
      */
     public Image[][] splitToSubImages(Image image, int resolution) {
+        if(subImageCache.containsKey(resolution)) {
+            return subImageCache.get(resolution);
+        }
         int subImageSize = image.getWidth() / resolution;
         int rows = image.getHeight() / subImageSize;
         Image[][] subImages = new Image[rows][resolution];
@@ -51,6 +58,7 @@ public class ImageProcessor {
                 subImages[row][col] = createSubImage(image, row, col, subImageSize);
             }
         }
+        subImageCache.put(resolution, subImages);
         return subImages;
     }
 
@@ -61,6 +69,9 @@ public class ImageProcessor {
      * @return Brightness value between 0 and 1.
      */
     public double calculateBrightness(Image image) {
+        if(brightnessCache.containsKey(image)){
+            return brightnessCache.get(image);
+        }
         double greySum = 0;
         int width = image.getWidth();
         int height = image.getHeight();
@@ -69,7 +80,9 @@ public class ImageProcessor {
                 greySum += calculatePixelGreyScale(image.getPixel(row, col));
             }
         }
-        return greySum / (width * height * RGB_MAX_VALUE);
+        double brightness = greySum / (width * height * RGB_MAX_VALUE);
+        brightnessCache.put(image, brightness);
+        return brightness;
     }
 
     private Color[][] createPaddedPixels(Image image, int newWidth, int newHeight) {

@@ -103,7 +103,7 @@ public class Shell {
         if(charMatcher.getCharset().size() < MIN_CHARSET_SIZE){
             throw AsciiExceptions.exSmallCharset();
         }
-        AsciiArtAlgorithm algorithm = new AsciiArtAlgorithm(image, res.getCurrentResolution(), charMatcher);
+        AsciiArtAlgorithm algorithm = new AsciiArtAlgorithm(image, res.getCurrentResolution(), charMatcher, imageProcessor);
         output.getCurrentOutput().out(algorithm.run());
     }
 
