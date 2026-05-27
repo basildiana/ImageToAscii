@@ -35,16 +35,15 @@ public class AsciiArtAlgorithm {
      */
     public char [][] run(){
         Image padImage = imageProcessor.padImage(this.image);
-        Image[][] subImages = imageProcessor.splitToSubImages(padImage, this.resolution);
-        int rows = subImages.length;
-        int cols = subImages[0].length;
+        // request the brightness matrix
+        double[][] brightnessMatrix = imageProcessor.getBrightnessMatrix(padImage, this.resolution);
+        int rows = brightnessMatrix.length;
+        int cols = brightnessMatrix[0].length;
         char[][] asciiArtResult = new char[rows][cols];
-
-        // each subimage gets its closest brightness character
+        // Map each brightness element straight to its character map symbol
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                double subImageBrightness = imageProcessor.calculateBrightness(subImages[r][c]);
-                asciiArtResult[r][c] = charManager.getCharByImageBrightness(subImageBrightness);
+                asciiArtResult[r][c] = charManager.getCharByImageBrightness(brightnessMatrix[r][c]);
             }
         }
         return asciiArtResult;
