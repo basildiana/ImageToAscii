@@ -1,6 +1,5 @@
 package image;
 
-import java.util.Arrays;
 import java.awt.Color;
 
 /**
@@ -16,10 +15,9 @@ public class ImageProcessor {
     private static final double RED_GREYSCALE = 0.2126;
     private static final double GREEN_GREYSCALE = 0.7152;
     private static final double BLUE_GREYSCALE = 0.0722;
-
     private int lastResolution = -1;
-    private Image[][] lastSubImages = null;
-    private double[][] lastBrightness = null;
+    private double[][] lastBrightnessArr = null;
+
     /**
      * Pads the given image with white pixels so its width and height are powers of two.
      *
@@ -38,6 +36,27 @@ public class ImageProcessor {
         return new Image(padPixels, newWidth, newHeight);
     }
 
+
+    public double[][] getBrightnessMatrix(Image paddedImage, int resolution) {
+        if (resolution == lastResolution && lastBrightnessArr != null) {
+            return lastBrightnessArr;
+        }
+        // res different so we need to calc
+        Image[][] subImages = splitToSubImages(paddedImage, resolution);
+        int rows = subImages.length;
+        int cols = subImages[0].length;
+        double[][] brightnessMatrix = new double[rows][cols];
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                brightnessMatrix[r][c] = calculateSubImageBrightness(subImages[r][c]);
+            }
+        }
+        this.lastResolution = resolution; // save in arr and what was the res
+        this.lastBrightnessArr = brightnessMatrix;
+        return brightnessMatrix;
+    }
+
     /**
      * Splits the image into square sub-images according to the requested resolution.
      * The resolution represents the number of sub-images in each row.
@@ -46,10 +65,8 @@ public class ImageProcessor {
      * @param resolution Number of sub-images in each row.
      * @return A two-dimensional array of sub-images.
      */
-    public Image[][] splitToSubImages(Image image, int resolution) {
-        if(resolution == lastResolution && lastSubImages != null) {
-            return lastSubImages;
-        }
+    // // ADDED: Restored this to a pure helper method without nested tracking side-effects.
+    private Image[][] splitToSubImages(Image image, int resolution) {
         int subImageSize = image.getWidth() / resolution;
         int rows = image.getHeight() / subImageSize;
         Image[][] subImages = new Image[rows][resolution];
@@ -57,12 +74,6 @@ public class ImageProcessor {
             for (int col = 0; col < resolution; col++) {
                 subImages[row][col] = createSubImage(image, row, col, subImageSize);
             }
-        }
-        lastResolution = resolution;
-        lastSubImages = subImages;
-        lastBrightness = new double[rows][resolution];
-        for(int row = 0; row < rows; row++){
-            Arrays.fill(lastBrightness[row], -1);
         }
         return subImages;
     }
@@ -73,11 +84,8 @@ public class ImageProcessor {
      * @param image The image whose brightness should be calculated.
      * @return Brightness value between 0 and 1.
      */
-    public double calculateBrightness(Image image) {
-        int[] location = findSubImage(image);
-        if(location != null && lastBrightness[location[0]][location[1]] != -1){
-            return lastBrightness[location[0]][location[1]];
-        }
+    // // ADDED: Changed name to reflect that it computes a single sub-image block's brightness purely.
+    private double calculateSubImageBrightness(Image image) {
         double greySum = 0;
         int width = image.getWidth();
         int height = image.getHeight();
@@ -86,26 +94,10 @@ public class ImageProcessor {
                 greySum += calculatePixelGreyScale(image.getPixel(row, col));
             }
         }
-        double brightness = greySum / (width * height * RGB_MAX_VALUE);
-        if(location != null) {
-            lastBrightness[location[0]][location[1]] = brightness;
-        }
-        return brightness;
+        return greySum / (width * height * RGB_MAX_VALUE);
     }
 
-    private int[] findSubImage(Image image){
-        if(lastSubImages == null){
-            return null;
-        }
-        for(int row = 0; row < lastSubImages.length; row++){
-            for(int col = 0; col < lastSubImages[row].length; col++){
-                if(lastSubImages[row][col] == image){
-                    return new int[]{row, col};
-                }
-            }
-        }
-        return null;
-    }
+    // // ADDED: The inefficient findSubImage() search method was entirely deleted to remove the performance bug.
 
     private Color[][] createPaddedPixels(Image image, int newWidth, int newHeight) {
         int oldWidth = image.getWidth();
