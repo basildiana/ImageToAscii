@@ -5,7 +5,6 @@ import java.util.TreeSet;
 
 /**
  * Handles printing the active character set in ASCII order.
- *
  * @author Diana Basil and Meital Lubarski
  */
 public class chars implements feature{
@@ -14,7 +13,6 @@ public class chars implements feature{
 
     /**
      * Constructs a chars feature.
-     *
      * @param charMatcher the active character matcher.
      */
     public chars(SubImgCharMatcher charMatcher){

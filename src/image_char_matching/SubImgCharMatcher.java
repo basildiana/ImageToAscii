@@ -60,11 +60,6 @@ public class SubImgCharMatcher {
         }
         if (reverseState) { // if we are in reverse state
             double oppB = 1.0 - brightness;
-            // what if our set is empty?
-            if (NormBToCharTreeMap.isEmpty()) { // TODO maybe delte, depends on shell logic
-                // TODO rather delete, breaks capsultion a little bit!!
-                throw new IllegalStateException("character set is empty.");
-            }
             double minB = NormBToCharTreeMap.firstKey();
             double maxB = NormBToCharTreeMap.lastKey();
             if (oppB < minB) {
