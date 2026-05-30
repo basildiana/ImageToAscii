@@ -21,13 +21,22 @@ encapsulating the removal grammar to ensure the shell stays lean and clean.
 reverse: Implements the feature interface to change the reverseState. Interacts with character matcher
 to invert how symbols match image pixels, encapsulating the trigger logic away from the shell loop.
 
-Output:// TODO MEITAL
+Output: Implements the feature interface and manages the current output type.
+Uses the AsciiOutput interface to switch between console output and HTML output
+without changing the shell code.
 
-Res: // TODO MEITAL
+Res: Implements the feature interface and manages the current image resolution.
+Checks resolution limits according to the image size and updates the number
+of characters per row based on user commands.
+This keeps the resolution logic separate from the shell code.
 
-Chars: // TODO MEITAL
+Chars: Implements the feature interface and prints the current character set
+in sorted ASCII order. This keeps the printing logic separate from the shell code.
 
-ImageProcessor: // TODO MEITAL
+ImageProcessor: Responsible for padding images, splitting them into sub-images, and calculating brightness values for
+ASCII matching.
+Also stores the last brightness matrix to avoid repeated calculations
+between runs with the same resolution.
 
 AsciiExceptions: A checked exception class handling validation, syntax, and execution errors.
 separates error string assembly from active program logic, using the Single Responsibility Principle.
@@ -44,7 +53,7 @@ Image: Bundles  pixel layouts into clean matrix grids // we didnt changed
 
 2) Data Structures for Efficiency
 in BrightnessAscii: double[] AsciiNumArray
-It optimizes memory usage by maintaining aמ array of exactly 95 slots (the legal ASCII characters)
+It optimizes memory usage by maintaining an array of exactly 95 slots (the legal ASCII characters)
 and provides constant time O(1) lookup for any character's raw brightness.
 we chose this because raw brightness doesn't change.
 
@@ -62,7 +71,10 @@ Map<String, feature> featureMap: Maps command strings to their feature instances
 This replaces nested conditional blocks with clean O(1) constant time lookups.
 
 in Chars:
-// TODO MEITAL please explain idk this
+TreeSet<Character> charset:
+We used TreeSet because it keeps characters sorted according to ASCII order, helps us print the active charset,
+and also prevents duplicate characters while maintaining efficient
+O(log N) insertion, removal, and lookup operations.
 
 in ImageProcessor:
 double[][] lastBrightnessArr:Stores the evaluated subimage matrix. saving calculations across consecutive
@@ -86,10 +98,8 @@ the mathematical inversion is calculated.
 public TreeSet<Character> getCharset(): Added to safely expose a sorted snapshot of the active symbol collection.
 Returning a new instance preserves defensive copying principles, preventing outer classes
 from corrupting internal collections.
-// TODO MEITAL check if you added more? or if there is more additions to the public api
 
 These changes keep character mapping calculations completely encapsulated inside the matcher component,
 ensuring that how an image's brightness corresponds to a character is managed in one single place.
 
-5) More API changes in classes?
-// TODO MEITAL check if you added alterations? im not sure with the image proccesor and that array
+5) No additional changes were made to the APIs of the provided classes.

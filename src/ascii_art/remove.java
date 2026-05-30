@@ -2,8 +2,10 @@ package ascii_art;
 
 import image_char_matching.SubImgCharMatcher;
 
-/** handles removing chars from  active charset
+/**
+ * handles removing chars from  active charset
  * supports removing a single character, 'all', 'space', and range
+ *
  * @author Diana Basil and Meital Lubarski
  */
 public class remove implements feature {
@@ -17,15 +19,20 @@ public class remove implements feature {
 
     private final SubImgCharMatcher charMatcher;
 
-    /** constructs a remove feature instance.
+    /**
+     * constructs a remove feature instance.
+     *
      * @param subImgCharMatcher the active character set manager.
      */
     public remove(SubImgCharMatcher subImgCharMatcher) {
         this.charMatcher = subImgCharMatcher;
     }
 
-    /** executes the feature logic
-     * @param args user args after the type of feature*/
+    /**
+     * executes the feature logic
+     *
+     * @param args user args after the type of feature
+     */
     @Override
     public void execute(String args) throws AsciiExceptions {
         // arg is empty or whitespace
@@ -39,14 +46,11 @@ public class remove implements feature {
         boolean flag = false; // input is invalid until helper returns true
         if (target.length() == SINGLE_CHAR) {
             flag = helperSingleChar(target.charAt(0));
-        }
-        else if (target.equals(CMD_ALL)) {
+        } else if (target.equals(CMD_ALL)) {
             flag = helperAll();
-        }
-        else if (target.equals(CMD_SPACE)) {
+        } else if (target.equals(CMD_SPACE)) {
             flag = helperSpace();
-        }
-        else if (target.length() == RANGE && target.charAt(1) == '-') {
+        } else if (target.length() == RANGE && target.charAt(1) == '-') {
             flag = helperRange(target.charAt(0), target.charAt(2));
         }
 
@@ -55,7 +59,9 @@ public class remove implements feature {
         }
     }
 
-    /** helper for removing a single character if it is in bounds.
+    /**
+     * helper for removing a single character if it is in bounds.
+     *
      * @return true if removed successfully, false if out of bounds.
      */
     private boolean helperSingleChar(char c) {
@@ -66,14 +72,18 @@ public class remove implements feature {
         return true;
     }
 
-    /** helper for removing all ASCII chars in our bounds.
+    /**
+     * helper for removing all ASCII chars in our bounds.
+     *
      * @return true if all chars removed successfully, false otherwise.
      */
     private boolean helperAll() {
-        return helperRange((char)MIN_ASCII, (char)MAX_ASCII);
+        return helperRange((char) MIN_ASCII, (char) MAX_ASCII);
     }
 
-    /** helper for removing a whitespace character.
+    /**
+     * helper for removing a whitespace character.
+     *
      * @return always true since space is valid.
      */
     private boolean helperSpace() {
@@ -81,8 +91,10 @@ public class remove implements feature {
         return true;
     }
 
-    /** helper for validating start and end, sorting the range,
+    /**
+     * helper for validating start and end, sorting the range,
      * and removing characters one after other
+     *
      * @return true if the range is valid and removed, false otherwise.
      */
     private boolean helperRange(char start, char end) {
@@ -94,12 +106,14 @@ public class remove implements feature {
         char sureEnd = ordered[1];
 
         for (int i = sureStart; i <= sureEnd; i++) {
-            charMatcher.removeChar((char)i);
+            charMatcher.removeChar((char) i);
         }
         return true;
     }
 
-    /** makes sure start is smaller than end in their ASCII values.
+    /**
+     * makes sure start is smaller than end in their ASCII values.
+     *
      * @return char array where index 0 is start and index 1 is end.
      */
     private char[] helperOrderRange(char start, char end) {
@@ -108,7 +122,9 @@ public class remove implements feature {
         return new char[]{low, high};
     }
 
-    /** validation checking that characters are inside boundaries.
+    /**
+     * validation checking that characters are inside boundaries.
+     *
      * @return true if inside the valid boundaries, false otherwise.
      */
     private boolean isValid(char c) {

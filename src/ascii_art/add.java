@@ -1,10 +1,13 @@
 package ascii_art;
+
 import image_char_matching.SubImgCharMatcher;
 
 /**
  * Handles adding chars to active charset.
  * Supports adding a single character, 'all', 'space' and range.
- * @author Diana Basil and Meital Lubarski */
+ *
+ * @author Diana Basil and Meital Lubarski
+ */
 public class add implements feature {
     private static final String CMD_ALL = "all";
     private static final String CMD_SPACE = "space";
@@ -19,8 +22,12 @@ public class add implements feature {
     public add(SubImgCharMatcher subImgCharMatcher) {
         this.charMatcher = subImgCharMatcher;
     }
-    /** executes the feature logic
-     * @param args user args after the type of feature*/
+
+    /**
+     * executes the feature logic
+     *
+     * @param args user args after the type of feature
+     */
     @Override
     public void execute(String args) throws AsciiExceptions {
 
@@ -34,14 +41,11 @@ public class add implements feature {
         boolean flag = false; // input is invalid until helper return true, fits 2.4.6
         if (target.length() == SINGLE_CHAR) {
             flag = helperSingleChar(target.charAt(0));
-        }
-        else if (target.equals(CMD_ALL)) {
+        } else if (target.equals(CMD_ALL)) {
             flag = helperAll();
-        }
-        else if (target.equals(CMD_SPACE)) {
+        } else if (target.equals(CMD_SPACE)) {
             flag = helperSpace();
-        }
-        else if (target.length() == RANGE && target.charAt(1) == '-') {
+        } else if (target.length() == RANGE && target.charAt(1) == '-') {
             flag = helperRange(target.charAt(0), target.charAt(2));
         }
         if (!flag) {
@@ -49,7 +53,9 @@ public class add implements feature {
         }
     }
 
-    /** helper for 2.4.1: adds a single character if it in bounds
+    /**
+     * helper for 2.4.1: adds a single character if it in bounds
+     *
      * @return true if added successfully, false if out of bounds.
      */
     private boolean helperSingleChar(char c) {
@@ -60,14 +66,18 @@ public class add implements feature {
         return true;
     }
 
-    /** helper for 2.4.2: adds all ASCII chars in our bounds
+    /**
+     * helper for 2.4.2: adds all ASCII chars in our bounds
+     *
      * @return true if all chars added successfully, false otherwise.
      */
     private boolean helperAll() {
-        return helperRange((char)MIN_ASCII, (char)MAX_ASCII);
+        return helperRange((char) MIN_ASCII, (char) MAX_ASCII);
     }
 
-    /** helper for 2.4.3: adds a whitespace
+    /**
+     * helper for 2.4.3: adds a whitespace
+     *
      * @return always true since space is valid.
      */
     private boolean helperSpace() {
@@ -75,9 +85,11 @@ public class add implements feature {
         return true;
     }
 
-    /** helper for 2.4.4: Validates start and end,
+    /**
+     * helper for 2.4.4: Validates start and end,
      * applies the reverse sorting helper,
      * and populates the range sequentially.
+     *
      * @return true if the range is valid and added, false otherwise
      */
     private boolean helperRange(char start, char end) {
@@ -89,12 +101,14 @@ public class add implements feature {
         char sureEnd = ordered[1];
 
         for (int i = sureStart; i <= sureEnd; i++) {
-            charMatcher.addChar((char)i);
+            charMatcher.addChar((char) i);
         }
         return true;
     }
 
-    /** make sure start is smaller than end in their ascii values
+    /**
+     * make sure start is smaller than end in their ascii values
+     *
      * @return char array, index 0 is start and index 1 is end.
      */
     private char[] helperOrderRange(char start, char end) {
@@ -103,7 +117,9 @@ public class add implements feature {
         return new char[]{low, high};
     }
 
-    /** validation checking that characters are inside boundaries
+    /**
+     * validation checking that characters are inside boundaries
+     *
      * @return true if inside the valid, false otherwise
      */
     private boolean isValid(char c) {

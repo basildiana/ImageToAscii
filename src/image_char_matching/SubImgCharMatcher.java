@@ -6,6 +6,7 @@ import java.util.TreeSet;
 
 /**
  * Matches sub images brightness levels to the closest ASCII character brightness
+ *
  * @author Diana Basil and Meital Lubarski
  */
 public class SubImgCharMatcher {
@@ -18,6 +19,7 @@ public class SubImgCharMatcher {
 
     /**
      * Constructs a character matcher initialized with a specific starting set of characters.
+     *
      * @param charset The initial array of characters to be utilized by the algorithm.
      */
     public SubImgCharMatcher(char[] charset) {
@@ -29,32 +31,42 @@ public class SubImgCharMatcher {
         }
     }
 
-    /** Adds a character to the active set
-     * @param c The character to add*/
+    /**
+     * Adds a character to the active set
+     *
+     * @param c The character to add
+     */
     public void addChar(char c) {
         if (characters.add(c)) {
             changedCharacters = true; // changed the set
         }
     }
-    /** Removes a character from the active set
-     * @param c The character to remove */
+
+    /**
+     * Removes a character from the active set
+     *
+     * @param c The character to remove
+     */
     public void removeChar(char c) {
         if (characters.remove(c)) {
             changedCharacters = true; // changed the set
         }
     }
 
-    /** change state of reverse flag */
+    /**
+     * change state of reverse flag
+     */
     public void changeReverse() {
         this.reverseState = !this.reverseState;
     }
 
     /**
      * given brightness of an image we return the char of the norm brightness which is closest.
+     *
      * @param brightness The  brightness of an image
      * @return The best matching character.
      */
-    public char getCharByImageBrightness(double brightness){
+    public char getCharByImageBrightness(double brightness) {
         if (changedCharacters) {
             updateTreeMap();
         }
@@ -64,11 +76,9 @@ public class SubImgCharMatcher {
             double maxB = NormBToCharTreeMap.lastKey();
             if (oppB < minB) {
                 brightness = minB; // TODO CHECK WITH FORUM
-            }
-            else if (oppB > maxB) {
+            } else if (oppB > maxB) {
                 brightness = maxB; // TODO CHECK WITH FORUM
-            }
-            else {
+            } else {
                 brightness = oppB;
             }
         }
@@ -76,10 +86,10 @@ public class SubImgCharMatcher {
         Double closeUp = NormBToCharTreeMap.ceilingKey(brightness);
         Double closeDown = NormBToCharTreeMap.floorKey(brightness);
 
-        if (closeUp == null){
+        if (closeUp == null) {
             return NormBToCharTreeMap.get(closeDown);
         }
-        if (closeDown == null){
+        if (closeDown == null) {
             return NormBToCharTreeMap.get(closeUp);
         }
         // compare diff, if the same take the down
@@ -89,18 +99,17 @@ public class SubImgCharMatcher {
         if (diffDown < diffUp) {
             char charDown = NormBToCharTreeMap.get(closeDown);
             return charDown;
-        }
-        else if (diffUp < diffDown) {
+        } else if (diffUp < diffDown) {
             char charUp = NormBToCharTreeMap.get(closeUp);
             return charUp;
-        }
-        else {//  (diffUp == diffDown) {
+        } else {//  (diffUp == diffDown) {
             char charDown = NormBToCharTreeMap.get(closeDown);
             char charUp = NormBToCharTreeMap.get(closeUp);
             char finalChar = (char) Math.min(charDown, charUp); // lower ASCII character value
             return finalChar;
         }
     }
+
     /**
      * Helper method to find the minimum and maximum raw brightness values
      * within the currently active character set.
@@ -120,8 +129,8 @@ public class SubImgCharMatcher {
                 maxB = rawB;
             }
         }
-        solution[0]=minB;
-        solution[1]=maxB;
+        solution[0] = minB;
+        solution[1] = maxB;
         return solution;
     }
 
@@ -152,7 +161,12 @@ public class SubImgCharMatcher {
         changedCharacters = false; // the tree is most updated, so flag is false
     }
 
-    public TreeSet<Character> getCharset(){
+    /**
+     * Returns the current active character set in sorted ASCII order.
+     *
+     * @return a sorted set containing the active characters.
+     */
+    public TreeSet<Character> getCharset() {
         return new TreeSet<>(characters);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 /**
  * creates ASCII art for a single run.
+ *
  * @authors Diana Basil and Meital Lubarski
  */
 public class AsciiArtAlgorithm {
@@ -18,11 +19,13 @@ public class AsciiArtAlgorithm {
 
     /**
      * Constructs an AsciiArtAlgorithm instance for a single run
-     * @param image       The image.
-     * @param resolution  The resolution
+     *
+     * @param image             The image.
+     * @param resolution        The resolution
      * @param subImgCharMatcher the active character set
      */
-    public AsciiArtAlgorithm(Image image, int resolution, SubImgCharMatcher subImgCharMatcher, ImageProcessor imageProcessor) {
+    public AsciiArtAlgorithm(Image image, int resolution, SubImgCharMatcher subImgCharMatcher,
+                             ImageProcessor imageProcessor) {
         this.image = image;
         this.resolution = resolution;
         this.charManager = subImgCharMatcher;
@@ -31,9 +34,10 @@ public class AsciiArtAlgorithm {
 
     /**
      * Runs the algorithm to transform the given image into a 2D array of ASCII characters.
+     *
      * @return A 2D array of characters representing the ASCII art.
      */
-    public char [][] run(){
+    public char[][] run() {
         Image padImage = imageProcessor.padImage(this.image);
         // request the brightness matrix
         double[][] brightnessMatrix = imageProcessor.getBrightnessMatrix(padImage, this.resolution);

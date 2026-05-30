@@ -9,7 +9,7 @@ import image.Image;
  *
  * @author Diana Basil and Meital Lubarski
  */
-public class res implements feature{
+public class res implements feature {
     private static final String UP = "up";
     private static final String DOWN = "down";
     private static final String SPACE_REGEX = "\\s+";
@@ -28,7 +28,7 @@ public class res implements feature{
      *
      * @param image the padded image used to calculate resolution boundaries.
      */
-    public res(Image image){
+    public res(Image image) {
         this.image = image;
         this.currentResolution = DEFAULT_RESOLUTION;
     }
@@ -41,18 +41,16 @@ public class res implements feature{
      */
     @Override
     public void execute(String args) throws AsciiExceptions {
-        if(args == null || args.trim().isEmpty()){
+        if (args == null || args.trim().isEmpty()) {
             System.out.println(MESSAGE_PREFIX + currentResolution + DOT);
             return;
         }
         String firstArg = args.trim().split(SPACE_REGEX)[0];
-        if(firstArg.equals(UP)){
+        if (firstArg.equals(UP)) {
             increaseResolution();
-        }
-        else if(firstArg.equals(DOWN)){
+        } else if (firstArg.equals(DOWN)) {
             decreaseResolution();
-        }
-        else{
+        } else {
             throw AsciiExceptions.exResFormat();
         }
         System.out.println(MESSAGE_PREFIX + currentResolution + DOT);
@@ -63,23 +61,33 @@ public class res implements feature{
      *
      * @return the current resolution.
      */
-    public int getCurrentResolution(){
+    public int getCurrentResolution() {
         return currentResolution;
     }
 
-    private void increaseResolution() throws  AsciiExceptions{
+    /**
+     * Increases the current resolution by a factor of 2.
+     *
+     * @throws AsciiExceptions if the new resolution exceeds the image width.
+     */
+    private void increaseResolution() throws AsciiExceptions {
         int newRes = currentResolution * RESOLUTION_FACTOR;
-        if(newRes > image.getWidth()){
+        if (newRes > image.getWidth()) {
             throw AsciiExceptions.exResBounds();
         }
         currentResolution = newRes;
     }
 
-    private void decreaseResolution() throws  AsciiExceptions{
+    /**
+     * Decreases the current resolution by a factor of 2.
+     *
+     * @throws AsciiExceptions if the new resolution is below the minimum allowed value.
+     */
+    private void decreaseResolution() throws AsciiExceptions {
         int newRes = currentResolution / RESOLUTION_FACTOR;
-        int minCharsInRow = Math.max(MIN_RESOLUTION, image.getWidth()/ image.getHeight());
-        if(newRes < minCharsInRow){
-            throw  AsciiExceptions.exResBounds();
+        int minCharsInRow = Math.max(MIN_RESOLUTION, image.getWidth() / image.getHeight());
+        if (newRes < minCharsInRow) {
+            throw AsciiExceptions.exResBounds();
         }
         currentResolution = newRes;
     }
