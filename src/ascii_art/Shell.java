@@ -45,7 +45,7 @@ public class Shell {
     /**
      * Constructs a shell with the default charset and resolution.
      */
-    public Shell(){
+    public Shell() {
         this.charMatcher = new SubImgCharMatcher(createDefaultCharset());
         this.imageProcessor = new ImageProcessor();
         this.featureMap = new HashMap<>();
@@ -56,65 +56,88 @@ public class Shell {
      *
      * @param imageName the image file path.
      */
-    public void run(String imageName){
+    public void run(String imageName) {
         try {
             image = imageProcessor.padImage(new Image(imageName));
             initFeatures();
             while (true) {
                 System.out.print(PROMPT);
                 String input = KeyboardInput.readLine();
-                try{
-                    if(!handleInput(input)){
+                try {
+                    if (!handleInput(input)) {
                         return;
                     }
-                } catch (AsciiExceptions e){
+                } catch (AsciiExceptions e) {
                     System.out.println(e.getMessage());
                 }
             }
-        } catch (IOException e)  {
+        } catch (IOException e) {
             return;
         }
     }
 
-    private boolean handleInput(String input) throws AsciiExceptions{
+    /**
+     * Handles and executes a single user command.
+     *
+     * @param input the full user input line.
+     * @return false if the user requested to exit, true otherwise.
+     * @throws AsciiExceptions if the command is invalid.
+     */
+    private boolean handleInput(String input) throws AsciiExceptions {
         String trimmedInput = input.trim();
-        if(trimmedInput.isEmpty()){
+        if (trimmedInput.isEmpty()) {
             throw AsciiExceptions.exInvalidCommand();
         }
         String[] words = trimmedInput.split(SPACE_REGEX);
         String command = words[COMMAND_INDEX];
         String args = extractArgs(trimmedInput, command);
-        if(command.equals(EXIT)){
+        if (command.equals(EXIT)) {
             return false;
         }
-        if(command.equals(ASCII_ART)){
+        if (command.equals(ASCII_ART)) {
             runAsciiArt();
             return true;
         }
         feature selectFeature = featureMap.get(command);
-        if(selectFeature == null){
+        if (selectFeature == null) {
             throw AsciiExceptions.exInvalidCommand();
         }
         selectFeature.execute(args);
         return true;
     }
 
-    private void runAsciiArt() throws AsciiExceptions{
-        if(charMatcher.getCharset().size() < MIN_CHARSET_SIZE){
+    /**
+     * Runs the ASCII art algorithm using the current settings.
+     *
+     * @throws AsciiExceptions if the charset is too small.
+     */
+    private void runAsciiArt() throws AsciiExceptions {
+        if (charMatcher.getCharset().size() < MIN_CHARSET_SIZE) {
             throw AsciiExceptions.exSmallCharset();
         }
-        AsciiArtAlgorithm algorithm = new AsciiArtAlgorithm(image, res.getCurrentResolution(), charMatcher, imageProcessor);
+        AsciiArtAlgorithm algorithm = new AsciiArtAlgorithm(image, res.getCurrentResolution(), charMatcher,
+                imageProcessor);
         output.getCurrentOutput().out(algorithm.run());
     }
 
-    private String extractArgs(String input, String command){
-        if(input.length() == command.length()){
+    /**
+     * Extracts the arguments part from the user input.
+     *
+     * @param input   the full user input.
+     * @param command the command name.
+     * @return the arguments after the command.
+     */
+    private String extractArgs(String input, String command) {
+        if (input.length() == command.length()) {
             return EMPTY_STRING;
         }
         return input.substring(command.length()).trim();
     }
 
-    private void initFeatures(){
+    /**
+     * Initializes all shell features and stores them in the feature map.
+     */
+    private void initFeatures() {
         output = new output();
         res = new res(image);
         featureMap.put(ADD, new add(charMatcher));
@@ -126,10 +149,15 @@ public class Shell {
     }
 
 
-    private char[] createDefaultCharset(){
-        int size = DEFAULT_LAST_CHAR - DEFAULT_FIRST_CHAR +1;
+    /**
+     * Creates the default charset containing the digits 0-9.
+     *
+     * @return an array of default ASCII characters.
+     */
+    private char[] createDefaultCharset() {
+        int size = DEFAULT_LAST_CHAR - DEFAULT_FIRST_CHAR + 1;
         char[] defaultCharset = new char[size];
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             defaultCharset[i] = (char) (DEFAULT_FIRST_CHAR + i);
         }
         return defaultCharset;
@@ -140,10 +168,8 @@ public class Shell {
      *
      * @param args command line arguments. args[0] is the image path.
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Shell shell = new Shell();
         shell.run(args[0]);
     }
-
-
 }

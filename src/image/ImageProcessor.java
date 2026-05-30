@@ -36,7 +36,14 @@ public class ImageProcessor {
         return new Image(padPixels, newWidth, newHeight);
     }
 
-
+    /**
+     * Calculates and returns the brightness matrix for the given image resolution.
+     * Reuses the previous matrix if the resolution did not change.
+     *
+     * @param paddedImage the padded image.
+     * @param resolution  the requested resolution.
+     * @return a matrix of brightness values.
+     */
     public double[][] getBrightnessMatrix(Image paddedImage, int resolution) {
         if (resolution == lastResolution && lastBrightnessArr != null) {
             return lastBrightnessArr;
@@ -65,7 +72,6 @@ public class ImageProcessor {
      * @param resolution Number of sub-images in each row.
      * @return A two-dimensional array of sub-images.
      */
-    // // ADDED: Restored this to a pure helper method without nested tracking side-effects.
     private Image[][] splitToSubImages(Image image, int resolution) {
         int subImageSize = image.getWidth() / resolution;
         int rows = image.getHeight() / subImageSize;
@@ -84,7 +90,6 @@ public class ImageProcessor {
      * @param image The image whose brightness should be calculated.
      * @return Brightness value between 0 and 1.
      */
-    // // ADDED: Changed name to reflect that it computes a single sub-image block's brightness purely.
     private double calculateSubImageBrightness(Image image) {
         double greySum = 0;
         int width = image.getWidth();
@@ -97,8 +102,14 @@ public class ImageProcessor {
         return greySum / (width * height * RGB_MAX_VALUE);
     }
 
-    // // ADDED: The inefficient findSubImage() search method was entirely deleted to remove the performance bug.
-
+    /**
+     * Creates a padded pixel matrix with white borders if needed.
+     *
+     * @param image     the original image.
+     * @param newWidth  the padded width.
+     * @param newHeight the padded height.
+     * @return a padded pixel matrix.
+     */
     private Color[][] createPaddedPixels(Image image, int newWidth, int newHeight) {
         int oldWidth = image.getWidth();
         int oldHeight = image.getHeight();
@@ -113,6 +124,17 @@ public class ImageProcessor {
         return pixels;
     }
 
+    /**
+     * Returns the correct pixel for the padded image.
+     * Returns a white pixel if the position is outside the original image.
+     *
+     * @param image     the original image.
+     * @param row       current row.
+     * @param col       current column.
+     * @param rowOffset vertical padding offset.
+     * @param colOffset horizontal padding offset.
+     * @return the matching pixel color.
+     */
     private Color getPaddedPixel(Image image, int row, int col, int rowOffset, int colOffset) {
         int originalRow = row - rowOffset;
         int originalCol = col - colOffset;
@@ -122,6 +144,15 @@ public class ImageProcessor {
         return image.getPixel(originalRow, originalCol);
     }
 
+    /**
+     * Creates a single square sub-image from the original image.
+     *
+     * @param image        the original image.
+     * @param subImageRow  sub-image row index.
+     * @param subImageCol  sub-image column index.
+     * @param subImageSize size of the sub-image.
+     * @return the created sub-image.
+     */
     private Image createSubImage(Image image, int subImageRow, int subImageCol, int subImageSize) {
         Color[][] pixels = new Color[subImageSize][subImageSize];
         int startRow = subImageRow * subImageSize;
@@ -134,10 +165,22 @@ public class ImageProcessor {
         return new Image(pixels, subImageSize, subImageSize);
     }
 
+    /**
+     * Converts an RGB color into a grayscale value.
+     *
+     * @param color the RGB color.
+     * @return the grayscale value.
+     */
     private double calculatePixelGreyScale(Color color) {
         return color.getRed() * RED_GREYSCALE + color.getGreen() * GREEN_GREYSCALE + color.getBlue() * BLUE_GREYSCALE;
     }
 
+    /**
+     * Finds the next power of two greater than or equal to the given number.
+     *
+     * @param number the input number.
+     * @return the next power of two.
+     */
     private int getNextPowerOfTwo(int number) {
         int power = 1;
         while (power < number) {
